@@ -231,7 +231,7 @@ const SignUpScreen = () => {
             <Text style={styles.txtLogin}>Đăng kí</Text>
           </TouchableOpacity>
 
-          <View style={styles.socialButtonsContainer}>
+          {/* <View style={styles.socialButtonsContainer}>
             <TouchableOpacity style={styles.googleButton}>
               <Image source={require('../design/image/ic_google.png')} style={styles.socialIcon} />
               <Text style={styles.socialTextGG}>GOOGLE</Text>
@@ -240,7 +240,7 @@ const SignUpScreen = () => {
               <Image source={require('../design/image/ic_facebook.png')} style={styles.socialIcon} />
               <Text style={styles.socialTextFB}>FACEBOOK</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

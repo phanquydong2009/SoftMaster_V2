@@ -2,80 +2,100 @@
 import { StyleSheet } from 'react-native';
 
 
-
 const styles = StyleSheet.create({
-// text lỗi 
-txtError :{
-  color : 'red',
-  textAlign :'center',
-
-},
+  // button tiếp theo
+  btnBottom: {
+    position: 'absolute',
+    bottom:20,
+    width: '100%',
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    paddingLeft : 40
+  },
+  btnNextLesson: {
+    backgroundColor: '#007BFF',
+    borderRadius: 30,
+    height: 50,
+    width: '90%', 
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  txtNext: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Mulish-Bold',
+  },
+  txtError: {
+    textAlign: 'center', // Nếu muốn căn giữa lỗi
+    color: 'red',
+    fontSize: 14,
+  },
 
   // styels popup 
 
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-      width: '80%',
-      backgroundColor: '#fff',
-      borderRadius: 10,
-      padding: 20,
-      alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
-    },
-    modalImage: {
-      width: 100,
-      height: 100,
-      marginBottom: 20,
-      resizeMode: 'contain',
-    },
-    modalTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 10,
-      color: '#333',
-      textAlign: 'center',
-    },
-    modalMessage: {
-      fontSize: 16,
-      color: '#666',
-      textAlign: 'center',
-      marginBottom: 20,
-    },
-    modalButton: {
-      width: '100%',
-      paddingVertical: 10,
-      borderRadius: 5,
-      backgroundColor: '#4CAF50',
-      alignItems: 'center',
-      marginVertical: 5,
-    },
-    modalButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: 'bold',
-    },
-    secondaryButton: {
-      backgroundColor: '#f44336',
-    },
- 
-  
- //
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+    resizeMode: 'contain',
+  },
+  modalTitle: {
+    fontSize: 18,
+    width: '100%',
+    marginBottom: 10,
+    color: '#333',
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButton: {
+    width: '100%',
+    paddingVertical: 10,
+    borderRadius: 5,
+    backgroundColor: '#4CAF50',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  secondaryButton: {
+    backgroundColor: '#f44336',
+  },
+
+
+  //
   timerText: {
     fontSize: 16,
-    color: 'black', 
+    color: 'black',
   },
   timerRedText: {
     fontSize: 16,
-    color: 'red', 
+    color: 'red',
   },
   timerGreenText: {
     fontSize: 16,
@@ -85,6 +105,12 @@ txtError :{
     fontSize: 16,
     color: 'blue',
     fontWeight: 'bold',
+  },
+
+
+  // ẩn icon 
+  dimmedIcon: {
+    opacity: 0.5, // Dims the icon by reducing opacity
   },
 
 
@@ -130,29 +156,31 @@ txtError :{
     fontSize: 21,
     fontWeight: '700',
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    backgroundColor: '#FFF',
-    height: 55,
-    marginVertical: 10
-  },
-  input: {
-    flex: 1,
-    paddingLeft: 10,
-  },
-  searchIcon: {
-    width: 38,
-    height: 38,
-  },
+
+  // search
+  // searchContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   borderWidth: 1,
+  //   borderColor: '#ccc',
+  //   borderRadius: 15,
+  //   paddingHorizontal: 10,
+  //   backgroundColor: '#FFF',
+  //   height: 55,
+  //   marginVertical: 10
+  // },
+  // input: {
+  //   flex: 1,
+  //   paddingLeft: 10,
+  // },
+  // searchIcon: {
+  //   width: 38,
+  //   height: 38,
+  // },
   icon_quizz: {
     height: 40,
     width: 40,
-  marginLeft:20,
+    marginLeft: 20,
   },
   sectionDay: {
     fontFamily: 'Mulish-Bold',
@@ -177,7 +205,7 @@ txtError :{
   courseSection: {
     padding: 15,
     borderRadius: 16,
-    marginBottom:1,
+    marginBottom: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center"

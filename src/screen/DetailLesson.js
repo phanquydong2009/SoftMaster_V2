@@ -1,48 +1,89 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Image, FlatList, Dimensions, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Image, FlatList, Dimensions, Modal, RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import YouTubeIframe from 'react-native-youtube-iframe';
 import styles from '../styles/DetailLessonStyles';
 import BASE_URL from '../component/apiConfig';
 
-// Lấy kích thước màn hình để tính chiều cao video
 const { width } = Dimensions.get('window');
 const videoHeight = (width * 9) / 16;
 
 const DetailLesson = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { _id, userID } = route.params;
+  const { _id, userID, courseID } = route.params || {};
+
+
+  // Ghi log để kiểm tra giá trị của _id và userID
+  useEffect(() => {
+    console.log("Nhận được giá trị _id:", _id);
+    console.log("Nhận được giá trị userID:", userID);
+    console.log('courseID:', courseID);
+  }, [route.params]);
+
   const [videoData, setVideoData] = useState([]);
   const [testData, setTestData] = useState([]);
   const [videoLink, setVideoLink] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  // const [watchedVideoIds, setWatchedVideoIds] = useState([]); 
   const [timeWatched, setTimeWatched] = useState(0);
   const [hasWatched, setHasWatched] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [errorText, setErrorText] = useState('');
-
-
+  const [completedTests, setCompletedTests] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
 
   const timerRef = useRef(null);
 
+
+
   // Fetch dữ liệu video và bài kiểm tra khi có `_id`
+  const fetchData = () => {
+    setRefreshing(true);
+
+    fetch(`${BASE_URL}/lessonVideo/getLessonVideoByLessonID/${_id}`)
+      .then((response) => response.json())
+      .then((json) => setVideoData(json))
+      .catch((error) => console.error('Lỗi khi lấy dữ liệu video:', error));
+
+    fetch(`${BASE_URL}/test/getTestByLessonID/${_id}`)
+      .then((response) => response.json())
+      .then((json) => {
+        setTestData(json);
+        json.forEach((test) => {
+          fetch(`${BASE_URL}/score/scores/canTakeTest/${userID}/${test._id}`)
+            .then((response) => response.json())
+            .then((json) => {
+              if (json.success || ['Người dùng chưa làm bài kiểm tra này.', 'Không thể kiểm tra trạng thái bài test.'].includes(json.message)) {
+                setCompletedTests((prevState) => ({
+                  ...prevState,
+                  [test._id]: false,
+                }));
+              } else if (json.message === 'Bạn đã đạt 10 điểm. Bạn có thể qua bài kiểm tra tiếp theo.') {
+                setCompletedTests((prevState) => ({
+                  ...prevState,
+                  [test._id]: true,
+                }));
+              } else {
+                setErrorText(json.message || 'Có lỗi xảy ra, vui lòng thử lại sau.');
+              }
+            })
+            .catch((error) => {
+              console.error('Lỗi khi lấy trạng thái bài kiểm tra:', error);
+              setErrorText('Lỗi hệ thống, vui lòng thử lại sau.');
+            });
+        });
+      })
+      .catch((error) => console.error('Lỗi khi lấy dữ liệu bài kiểm tra:', error))
+      .finally(() => setRefreshing(false));
+  };
+
+  // Gọi hàm fetchData khi component được render lần đầu
   useEffect(() => {
     if (_id) {
-      fetch(`${BASE_URL}/lessonVideo/getLessonVideoByLessonID/${_id}`)
-        .then((response) => response.json())
-        .then((json) => setVideoData(json))
-        .catch((error) => console.error('Lỗi khi lấy dữ liệu video:', error));
-
-      fetch(`${BASE_URL}/test/getTestByLessonID/${_id}`)
-        .then((response) => response.json())
-        .then((json) => setTestData(json))
-        .catch((error) => console.error('Lỗi khi lấy dữ liệu bài kiểm tra:', error));
+      fetchData();
     }
-  }, [_id]);
+  }, [_id, userID]);
 
-  // Bắt đầu phát video và thiết lập bộ đếm thời gian
   const handlePlayVideo = (videoUrl) => {
     const videoId = videoUrl.split('youtu.be/')[1]?.split('?')[0];
     setVideoLink(videoId);
@@ -54,46 +95,30 @@ const DetailLesson = () => {
     }, 1000);
   };
 
-  // Dừng video và tắt bộ đếm thời gian
   const handleStopVideo = () => {
     setIsPlaying(false);
     clearInterval(timerRef.current);
   };
 
-  // Điều hướng đến màn hình bài Quiz nếu đã xem đủ thời gian
-  const handleGoToQuiz = (testId, index) => {
-    setErrorText(''); 
-  
+  const handleGoToQuiz = (testId) => {
+    setErrorText('');
     if (!hasWatched) {
-      
       setModalVisible(true);
       return;
     }
-  
-    // Gọi API để kiểm tra trạng thái bài kiểm tra
+
     fetch(`${BASE_URL}/score/scores/canTakeTest/${userID}/${testId}`)
       .then((response) => response.json())
       .then((json) => {
-        console.log('API response:', json); // Log phản hồi từ API
-  
-        // Kiểm tra nếu có success
-        if (json.success) {
+        if (json.success || ['Người dùng chưa làm bài kiểm tra này.', 'Không thể kiểm tra trạng thái bài test.'].includes(json.message)) {
           navigation.navigate('QuizzCourse', { testId, userID });
-        } else if (json.message) { // Kiểm tra json.message thay vì json.error
-          // Kiểm tra các thông báo lỗi từ API
-          if (json.message === 'Người dùng chưa làm bài kiểm tra này.') {
-            // Nếu thông báo là người dùng chưa làm bài kiểm tra, cho phép làm bài
-            navigation.navigate('QuizzCourse', { testId, userID });
-          } else if (json.message === 'Không thể kiểm tra trạng thái bài test.') {
-            // Nếu không thể kiểm tra trạng thái, cho phép làm bài kiểm tra
-            navigation.navigate('QuizzCourse', { testId, userID });
-          } else {
-            // Xử lý các thông báo lỗi khác
-            setErrorText('Có lỗi xảy ra, vui lòng thử lại sau.');
-          }
+        } else if (json.message === 'Bạn đã đạt 10 điểm. Bạn có thể qua bài kiểm tra tiếp theo.') {
+          setCompletedTests((prevState) => ({
+            ...prevState,
+            [testId]: true,
+          }));
         } else {
-          // Xử lý khi không nhận được success hoặc message từ API
-          setErrorText('Có lỗi xảy ra, vui lòng thử lại sau.');
+          setErrorText(json.message || 'Có lỗi xảy ra, vui lòng thử lại sau.');
         }
       })
       .catch((error) => {
@@ -101,13 +126,10 @@ const DetailLesson = () => {
         setErrorText('Lỗi hệ thống, vui lòng thử lại sau.');
       });
   };
-  
 
-  // Hiển thị các item bài kiểm tra
   const renderTestItem = ({ item, index }) => {
-    console.log(`Test ID ${index + 1}: ${item._id}`); // Log ra testId của bài kiểm tra
     const updatedAt = item.updatedAt.split('T')[0];
-  
+    const isTestCompleted = completedTests[item._id];
     return (
       <View style={styles.columnItem}>
         <View style={styles.courseSection}>
@@ -118,13 +140,10 @@ const DetailLesson = () => {
             <Text style={styles.sectionTitle}>{item.title}</Text>
             <Text style={styles.sectionDay}>{updatedAt}</Text>
           </View>
-          <TouchableOpacity onPress={() => handleGoToQuiz(item._id, index)}>
+          <TouchableOpacity onPress={() => handleGoToQuiz(item._id)}>
             <Image
-              source={require('../design/image/ic_quiz.png')}
-              style={[
-                styles.icon_quizz,
-                { opacity: hasWatched ? 1 : 0.5 },
-              ]}
+              source={isTestCompleted ? require('../design/image/complete_icon.png') : require('../design/image/ic_quiz.png')}
+              style={styles.icon_quizz}
             />
           </TouchableOpacity>
         </View>
@@ -132,13 +151,8 @@ const DetailLesson = () => {
       </View>
     );
   };
-  
 
-
-
-  // Hiển thị các item video
   const renderVideoItem = ({ item, index }) => {
-    console.log(`VIDEO ID ${index + 1}: ${item._id}`);
     const updatedAt = item.updatedAt.split('T')[0];
 
     return (
@@ -160,8 +174,6 @@ const DetailLesson = () => {
     );
   };
 
-
-  // Cập nhật trạng thái đã xem sau khi người dùng đã xem đủ 10 giây
   useEffect(() => {
     if (timeWatched >= 10 && !hasWatched) {
       setHasWatched(true);
@@ -169,13 +181,33 @@ const DetailLesson = () => {
     }
   }, [timeWatched, hasWatched]);
 
-  // Hủy bỏ bộ đếm thời gian khi thoát khỏi màn hình
   useEffect(() => {
     return () => clearInterval(timerRef.current);
   }, []);
 
   const goBack = () => {
     navigation.goBack();
+  };
+
+  // kiểm tra các test đã hoàn thành hoàn toàn chưa
+  const areAllTestsCompleted = testData.every((test) => completedTests[test._id] === true);
+
+  // Khi nút "Học bài tiếp theo" được bấm, chuyển qua màn MyCourseDetail với lessonIdDone
+  const handleNextLesson = () => {
+    if (areAllTestsCompleted) {
+      // Lấy _id và userID từ route.params
+      const { _id, userID } = route.params;
+
+      // Gán _id thành courseID 
+      const testIdDone = _id;
+     
+
+      // Log giá trị truyền đi
+      console.log(`Thông tin truyền đi: testIdDone = ${testIdDone}, userID = ${userID}, courseID = ${courseID}`);
+
+      // Điều hướng đến MyCourseDetail với courseID và userID
+      navigation.navigate('MyCourseDetail', { testIdDone, userID ,courseID});
+    }
   };
 
   return (
@@ -187,12 +219,12 @@ const DetailLesson = () => {
         <Text style={styles.headerTitle}>Video & Bài Quizz</Text>
       </View>
 
-      <View style={styles.searchContainer}>
+      {/* <View style={styles.searchContainer}>
         <TextInput style={styles.input} placeholder="Tìm kiếm..." />
         <TouchableOpacity>
           <Image source={require('../design/image/ic_search.png')} style={styles.searchIcon} />
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {isPlaying && videoLink ? (
         <View style={{ flex: 1 }}>
@@ -241,9 +273,11 @@ const DetailLesson = () => {
                   <FlatList
                     data={videoData}
                     renderItem={renderVideoItem}
-                    keyExtractor={(item, index) => `${item._id}-video-${index}`}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 20 }}
+                    keyExtractor={(item) => item._id.toString()}
+                    ListEmptyComponent={<Text>Chưa có video nào.</Text>}
+                    refreshControl={
+                      <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
+                    }
                   />
                 </View>
               )}
@@ -255,9 +289,8 @@ const DetailLesson = () => {
                   <FlatList
                     data={testData}
                     renderItem={renderTestItem}
-                    keyExtractor={(item, index) => `${item._id}-test-${index}`}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 20 }}
+                    keyExtractor={(item) => item._id.toString()}
+                    ListEmptyComponent={<Text>Chưa có bài kiểm tra nào.</Text>}
                   />
                 </View>
               )}
@@ -267,6 +300,20 @@ const DetailLesson = () => {
       )}
       <Text style={[styles.txtError, { display: errorText ? 'flex' : 'none' }]}>{errorText}</Text>
 
+
+      {/* // nút hoàn thành bài test */}
+      <View style={styles.btnBottom}>
+        <TouchableOpacity
+          style={[
+            styles.btnNextLesson,
+            !areAllTestsCompleted && { opacity: 0.5 },
+          ]}
+          disabled={!areAllTestsCompleted}
+          onPress={handleNextLesson}
+        >
+          <Text style={styles.txtNext}>Học bài tiếp theo</Text>
+        </TouchableOpacity>
+      </View>
 
       <Modal
         animationType="fade"

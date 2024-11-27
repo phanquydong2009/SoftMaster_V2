@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   FlatList,
+  RefreshControl,  
 } from 'react-native';
 import ToolBar from '../../component/ToolBar';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -19,24 +20,34 @@ const CertificationScreen = () => {
   const { userID } = route.params || {};
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false); // State for refresh control
+
+  // Define fetchCertificates outside of useEffect so it can be used in both places
+  const fetchCertificates = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${BASE_URL}/certificate/getbyuserID/${userID}`);
+      const data = await response.json();
+      setCertificates(data.certificates || []);
+    } catch (error) {
+      console.error('Lỗi khi lấy dữ liệu từ API:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCertificates = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/certificate/getbyuserID/${userID}`);
-        const data = await response.json();
-        setCertificates(data.certificates || []);
-      } catch (error) {
-        console.error('Lỗi khi lấy dữ liệu từ API:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (userID) {
       fetchCertificates();
     }
   }, [userID]);
+
+  // Refresh function
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchCertificates();  // Call the function here
+    setRefreshing(false);
+  };
 
   const handleCert = () => {
     console.log('truyền đi userID:', userID);
@@ -85,6 +96,12 @@ const CertificationScreen = () => {
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}  
+            onRefresh={onRefresh} 
+          />
+        }
       />
     </SafeAreaView>
   );

@@ -15,22 +15,20 @@ import styles from '../styles/MyCourseDetailScreenStyles';
 const MyCourseDetail = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { courseID, userID } = route.params;
-
-
-  // Log giá trị courseID để kiểm tra
-  useEffect(() => {
-    console.log("courseID nhận được từ params:", courseID);
-  }, [courseID]);
+  const { courseID, userID } = route.params || {};
+  const { testIdDone } = route.params || {};
 
   const [data, setData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [message, setMessage] = useState('');  // State for the message
 
   useEffect(() => {
+    if (!courseID) return;
+
     const fetchData = async () => {
       try {
         const response = await axios.get(`${BASE_URL}/lesson/getLessonByCourseID/${courseID}`);
-        // Gán dữ liệu từ API vào state
-        const lessonsWithID = response.data.map(lesson => ({
+        const lessonsWithID = response.data.map((lesson) => ({
           ...lesson,
           _id: lesson._id || "default_id",
         }));
@@ -47,26 +45,64 @@ const MyCourseDetail = () => {
     navigation.goBack();
   };
 
-  const handleGoToDetailLesson = (_id) => {
-    console.log("Truyền ID và userID:", _id, userID);
-    navigation.navigate('DetailLesson', { _id, userID });
+  const handleDetailLesson = (_id) => {
+    navigation.navigate('DetailLesson', { _id, userID, courseID });
   };
-  
 
-  const renderItem = ({ item, index }) => (
-    <TouchableOpacity style={styles.columnItem} onPress={() => handleGoToDetailLesson(item._id)}>
-      <View style={styles.courseSection}>
-        <View style={styles.number_container}>
-          <Text style={styles.number}>{String(index + 1).padStart(2, '0')}</Text>
-        </View>
-        <View style={styles.column_text}>
-          <Text style={styles.sectionTitle}>{item.title}</Text>
-          <Text style={styles.sectionDay}>{item.updatedAt.split('T')[0]}</Text>
-        </View>
-      </View>
-      <View style={styles.separator} />
-    </TouchableOpacity>
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+  };
+
+  // Add certificate
+  const handleAddCertificate = async () => {
+    if (!courseID || !userID) {
+      setMessage(`Không thể thêm chứng chỉ: courseID = ${courseID}, userID = ${userID}`);
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${BASE_URL}/certificate/addcertificate/${userID}/${courseID}`);
+
+      if (response.status === 200 || response.status === 201) {
+        console.log("Thêm chứng chỉ thành công:", response.data);
+        setMessage(response.data.message || "Chứng chỉ đã được thêm thành công!");
+      } else {
+        console.error("Thêm chứng chỉ thất bại:", response.data);
+        setMessage(response.data.message || "Có lỗi xảy ra khi thêm chứng chỉ.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API thêm chứng chỉ:", error);
+      setMessage("Không thể thêm chứng chỉ. Vui lòng thử lại sau.");
+    }
+  };
+
+
+  const isAllCompleted = data.every((lesson) => lesson._id === testIdDone);
+
+  const filteredData = data.filter(item =>
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const renderItem = ({ item, index }) => {
+    const isCompleted = testIdDone === item._id;
+
+    return (
+      <TouchableOpacity style={styles.columnItem} onPress={() => handleDetailLesson(item._id)}>
+        <View style={styles.courseSection}>
+          <View style={styles.number_container}>
+            <Text style={styles.number}>{String(index + 1).padStart(2, '0')}</Text>
+          </View>
+          <View style={styles.column_text}>
+            <Text style={styles.sectionTitle}>{item.title}</Text>
+            <Text style={styles.sectionDay}>{item.updatedAt.split('T')[0]}</Text>
+          </View>
+          {isCompleted && <Image source={require('../design/image/complete_icon.png')} />}
+        </View>
+        <View style={styles.separator} />
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -78,7 +114,12 @@ const MyCourseDetail = () => {
       </View>
 
       <View style={styles.searchContainer}>
-        <TextInput style={styles.input} placeholder="Tìm kiếm..." />
+        <TextInput
+          style={styles.input}
+          placeholder="Tìm kiếm..."
+          value={searchQuery}
+          onChangeText={handleSearch}
+        />
         <TouchableOpacity>
           <Image
             source={require('../design/image/ic_search.png')}
@@ -87,21 +128,40 @@ const MyCourseDetail = () => {
         </TouchableOpacity>
       </View>
 
-      {data.length === 0 ? (
+      {filteredData.length === 0 ? (
         <View style={styles.noDataContainer}>
-          <Text style={styles.noDataText}>Chưa có khóa học nào ! Giảng viên sẽ cập nhật sau!</Text>
+          <Text style={styles.noDataText}>Chưa có khóa học nào! Giảng viên sẽ cập nhật sau!</Text>
         </View>
       ) : (
         <FlatList
-          data={data}
+          data={filteredData}
           renderItem={renderItem}
           keyExtractor={(item) => item._id}
           showsVerticalScrollIndicator={false}
           style={styles.container_list}
         />
       )}
+
+      {/* Error Text */}
+      {message && (
+        <View style={styles.errorTextContainer}>
+          <Text style={styles.errorText}>{message}</Text>
+        </View>
+      )}
+
+      {/* Nút hoàn thành bài học */}
+      {isAllCompleted && (
+        <View style={styles.btnBottom}>
+          <TouchableOpacity style={styles.btnNextLesson} onPress={handleAddCertificate}>
+            <Text style={styles.txtNext}>Học bài tiếp theo</Text>
+          </TouchableOpacity>
+
+
+        </View>
+      )}
     </View>
   );
+
 };
 
 export default MyCourseDetail;

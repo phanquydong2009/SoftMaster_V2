@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import navigation hook
 import styles from '../styles/QuizzCourseStyles'; 
 import BASE_URL from './apiConfig';
-const CustomAlert = ({ visible, onClose, score, scoreType, userID, testId }) => {
+
+const CustomAlert = ({ visible, score, scoreType, userID, testId }) => {
+  const navigation = useNavigation(); // Use navigation hook
+
   // Gọi API khi modal đóng lại
   const submitScore = async () => {
     console.log('Gửi dữ liệu:', { userID, testId, score });
 
-
     try {
-      const response = await fetch(`${BASE_URL}/score/addScore'`, {
+      const response = await fetch(`${BASE_URL}/score/addScore`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -20,17 +23,17 @@ const CustomAlert = ({ visible, onClose, score, scoreType, userID, testId }) => 
           score: score,
         }),
       });
-
-      // Log phản hồi từ server
+    
       if (response.ok) {
         const responseData = await response.json();
-     
-        console.log('Gửi điểm thành công ,API trả về:', responseData);
+        console.log('Gửi điểm thành công, API trả về:', responseData);
       } else {
-        console.error('Có lỗi khi gửi điểm số:', response.statusText);
+        console.log('Phản hồi từ server:', response.status, response.statusText);
+        const errorData = await response.json();
+        console.error('Chi tiết lỗi:', errorData);
       }
     } catch (error) {
-      console.error('Lỗi kết nối đến API:', error);
+      console.error('Lỗi kết nối đến API:', error.message);
     }
   };
 
@@ -41,12 +44,17 @@ const CustomAlert = ({ visible, onClose, score, scoreType, userID, testId }) => 
     }
   }, [visible]);
 
+  // Function to handle navigation to DetailLesson
+  const handleGoBackToDetailLesson = () => {
+    navigation.goBack(); // Navigates to the previous screen (DetailLesson)
+  };
+
   return (
     <Modal
       transparent={true}
       visible={visible}
       animationType="slide"
-      onRequestClose={onClose}>
+      onRequestClose={handleGoBackToDetailLesson}>
       <View style={styles.modalBackground}>
         <View style={styles.modalContainer}>
           <Image
@@ -61,7 +69,7 @@ const CustomAlert = ({ visible, onClose, score, scoreType, userID, testId }) => 
           <Text style={styles.modalFooterText}>{scoreType}</Text>
 
           <TouchableOpacity
-            onPress={onClose}
+            onPress={handleGoBackToDetailLesson} // Use new function to navigate back
             style={styles.continueButtonDone}>
             <Text style={styles.continueButtonTextDone}>Tiếp theo</Text>
             <Image

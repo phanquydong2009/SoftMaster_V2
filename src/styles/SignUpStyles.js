@@ -96,45 +96,45 @@ const styles = StyleSheet.create({
     fontFamily: 'Mulish-Bold',
   },
 
-  socialButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 30,
-    marginBottom: 20
-  },
-  googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#000000',
-    borderWidth: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  facebookButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1877F2',
-    paddingHorizontal: 20,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  socialIcon: {
-    width: 25,
-    height: 25,
-    marginRight: 10,
-  },
-  socialTextFB: {
-    fontFamily: 'Mulish-Bold',
-    fontSize: 13,
-    color: '#FFFFFF',
-  },
-  socialTextGG: {
-    fontSize: 16,
-    fontFamily: 'Mulish-Bold',
-    color: '#191B28',
-  },
+  // socialButtonsContainer: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-around',
+  //   marginTop: 30,
+  //   marginBottom: 20
+  // },
+  // googleButton: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   backgroundColor: '#FFFFFF',
+  //   borderColor: '#000000',
+  //   borderWidth: 1,
+  //   paddingHorizontal: 20,
+  //   paddingVertical: 3,
+  //   borderRadius: 10,
+  // },
+  // facebookButton: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   backgroundColor: '#1877F2',
+  //   paddingHorizontal: 20,
+  //   paddingVertical: 3,
+  //   borderRadius: 10,
+  // },
+  // socialIcon: {
+  //   width: 25,
+  //   height: 25,
+  //   marginRight: 10,
+  // },
+  // socialTextFB: {
+  //   fontFamily: 'Mulish-Bold',
+  //   fontSize: 13,
+  //   color: '#FFFFFF',
+  // },
+  // socialTextGG: {
+  //   fontSize: 16,
+  //   fontFamily: 'Mulish-Bold',
+  //   color: '#191B28',
+  // },
 
 
 });

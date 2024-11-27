@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#F5F9FF',
   },
   txtHeader: {
     marginLeft: 15,
@@ -79,10 +80,11 @@ const styles = StyleSheet.create({
   image: {
     width: 26,
     height: 26,
-    marginRight: 20, 
+    marginRight: 20,
   },
+
   viewQuizzAsk: {
-    marginTop: 20,
+    marginTop: 10,
     flex: 1,
     backgroundColor: '#F5F9FF',
     justifyContent: 'center',
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Mulish',
     fontSize: 16,
     fontWeight: '700',
-    width: '90%', 
+    width: '90%',
 
   },
   viewQuizz: {
@@ -116,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 15,
     height: 120,
-    padding: 20,
+    padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -149,17 +151,34 @@ const styles = StyleSheet.create({
   viewHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
+
   },
-  continueButton: {
+  containerButtonBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+  },
+  continueButtonPrev: {
     backgroundColor: '#0961F5',
     height: 60,
     borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 20,
-    paddingHorizontal: 20,
+    flex: 1,
+  marginRight  : 10
+  },
+
+  continueButtonNext: {
+    backgroundColor: '#0961F5',
+    height: 60,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flex: 1,
+ marginLeft : 10
+
   },
   continueButtonText: {
     color: '#FFFFFF',
@@ -167,7 +186,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     flex: 1,
     textAlign: 'center',
-    marginLeft: 50,
+
   },
   continueButtonImage: {
     width: 45,

@@ -158,7 +158,6 @@ const DetailScreen = () => {
 
 
   // kiểm tra user đã tham gia khóa học chưa 
-
   const onJoinCoursePress = async () => {
     try {
       // Kiểm tra xem người dùng đã tham gia khóa học chưa
@@ -166,16 +165,16 @@ const DetailScreen = () => {
       const checkEnrollmentResponse = await fetch(
         `${BASE_URL}/enrollCourse/check-enrollment/${userID}/${courseId}`
       );
-
+  
       if (!checkEnrollmentResponse.ok) {
         throw new Error('Lỗi khi kiểm tra tham gia khóa học');
       }
-
+  
       const enrollmentData = await checkEnrollmentResponse.json();
       console.log('Dữ liệu trạng thái tham gia:', enrollmentData);
-
+  
       // Nếu đã tham gia khóa học
-      if (enrollmentData.isEnrolled) {
+      if (enrollmentData.enrolled) {
         Alert.alert(
           'Thông báo',
           'Bạn đã tham gia khóa học này rồi!',
@@ -193,9 +192,9 @@ const DetailScreen = () => {
             },
           ]
         );
-        return;
+        return; // Dừng việc tạo link thanh toán và không tiếp tục
       }
-
+  
       // Nếu khóa học có giá > 0, tạo URL thanh toán
       if (courseData.price > 0) {
         console.log('Đang tạo URL thanh toán...');
@@ -209,7 +208,6 @@ const DetailScreen = () => {
             userID
           });
         }
-
       } else {
         // Nếu khóa học miễn phí, thực hiện đăng ký
         console.log('Đang đăng ký vào khóa học miễn phí...');
@@ -222,16 +220,16 @@ const DetailScreen = () => {
             },
           }
         );
-
+  
         if (!enrollResponse.ok) {
           throw new Error('Lỗi khi đăng ký khóa học');
         }
-
+  
         const enrollResult = await enrollResponse.json();
         console.log('Kết quả đăng ký:', enrollResult);
         Alert.alert(
           'Thông báo',
-          'Bạn đã tham gia khóa học thành công !',
+          'Bạn đã tham gia khóa học thành công!',
           [
             {
               text: 'Quay lại khóa học của tôi',
@@ -264,6 +262,7 @@ const DetailScreen = () => {
       );
     }
   };
+  
 
 
   if (isLoading) {

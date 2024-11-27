@@ -33,7 +33,7 @@ const CourseScreen = ({ route }) => {
       const courseDetails = await Promise.all(
         enrolledCourses.map(async (course) => {
           const courseDetailURL = `${BASE_URL}/course/getDetailByCourseID/${course.courseID._id}`;
-          console.log("Lấy chi tiết cho courseID:", course.courseID._id); 
+          // console.log("Lấy chi tiết cho courseID:", course.courseID._id); 
           const courseDetailResponse = await axios.get(courseDetailURL);
           return {
             ...courseDetailResponse.data,
@@ -66,7 +66,6 @@ const CourseScreen = ({ route }) => {
   };
 
   const handleViewCourseDetail = (courseID) => {
-    console.log("Đến MyCourseDetail với courseID:", courseID); 
     navigation.navigate('MyCourseDetail', { courseID, userID });
   };
 

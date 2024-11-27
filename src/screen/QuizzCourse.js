@@ -99,7 +99,31 @@ const QuizzCourse = () => {
       }
     }, 1000);
   };
-
+  const handlePrev = () => {
+    if (currentQuestionIndex > 0) {
+      // Xác định câu hỏi trước đó
+      const previousIndex = currentQuestionIndex - 1;
+  
+      // Kiểm tra câu trả lời trước đó
+      const wasCorrect = answerCheck[previousIndex];
+  
+      // Nếu đúng thì trừ điểm
+      if (wasCorrect) {
+        setScore(score - 1);
+      }
+  
+      // Xóa trạng thái câu trả lời của câu hỏi trước
+      const updatedAnswerCheck = [...answerCheck];
+      updatedAnswerCheck.pop();
+      setAnswerCheck(updatedAnswerCheck);
+  
+      // Quay lại câu hỏi trước
+      setCurrentQuestionIndex(previousIndex);
+      setSelectedOption(null); // Xóa lựa chọn hiện tại
+      setErrorMessage(''); // Xóa thông báo lỗi
+    }
+  };
+  
   if (questions.length === 0) return <Text>Đang tải...</Text>;
 
   const { title, options } = questions[currentQuestionIndex];
@@ -124,30 +148,43 @@ const QuizzCourse = () => {
 
       {/* Quizz Ask */}
       <View style={styles.viewQuizzAsk}>
-        {options.map((option) => (
+        {options.map((option, index) => (
           <TouchableOpacity
             onPress={() => handlePress(option.text)}
-            key={option.text}
-            style={[styles.innerContainer, {
-              borderColor: selectedOption === option.text
-                ? '#000000'
-                : (answerCheck[currentQuestionIndex] !== undefined
-                  ? (answerCheck[currentQuestionIndex] && option.isCorrect ? '#167F71' : !option.isCorrect && selectedOption === option.text ? '#EC2222' : '#e5e5e5')
-                  : 'transparent'),
-              borderWidth: 1,
-            }]} >
+            key={`${option.text}-${index}`}
+            style={[
+              styles.innerContainer,
+              {
+                borderColor:
+                  selectedOption === option.text
+                    ? '#000000'
+                    : answerCheck[currentQuestionIndex] !== undefined
+                      ? answerCheck[currentQuestionIndex] && option.isCorrect
+                        ? '#167F71'
+                        : !option.isCorrect && selectedOption === option.text
+                          ? '#EC2222'
+                          : '#e5e5e5'
+                      : 'transparent',
+                borderWidth: 1,
+              },
+            ]}
+          >
             <Image
-              source={selectedOption === option.text
-                ? require('../design/image/icon_oval2.png')
-                : require('../design/image/icon_oval1.png')}
+              source={
+                selectedOption === option.text
+                  ? require('../design/image/icon_oval2.png')
+                  : require('../design/image/icon_oval1.png')
+              }
               style={styles.image}
             />
             <Text style={styles.text}>{option.text}</Text>
           </TouchableOpacity>
         ))}
 
+
         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
       </View>
+
 
       {/* Custom Modal */}
       <CustomAlert
@@ -160,16 +197,30 @@ const QuizzCourse = () => {
       />
 
       {/* Continue Button */}
-      <TouchableOpacity
-        onPress={handleContinue}
-        style={styles.continueButton}
-      >
-        <Text style={styles.continueButtonText}>Câu hỏi tiếp theo</Text>
-        <Image
-          source={require('../design/image/icon_continue.png')}
-          style={styles.continueButtonImage}
-        />
-      </TouchableOpacity>
+      <View style={styles.containerButtonBottom}>
+        <TouchableOpacity
+          onPress={handlePrev}
+          style={styles.continueButtonPrev}
+        >
+          <Image
+            source={require('../design/image/prev_quizz.png')}
+            style={styles.continueButtonImage}
+          />
+          <Text style={styles.continueButtonText}>Câu trước</Text>
+
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleContinue}
+          style={styles.continueButtonNext}
+        >
+          <Text style={styles.continueButtonText}>Tiếp theo</Text>
+          <Image
+            source={require('../design/image/next_quizz.png')}
+            style={styles.continueButtonImage}
+          />
+        </TouchableOpacity>
+      </View>
+
     </View>
   );
 };

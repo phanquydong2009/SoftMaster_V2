@@ -3,7 +3,78 @@ import { StyleSheet } from 'react-native';
 
 
 const styles = StyleSheet.create({
-
+//text error
+errorTextContainer: {
+  marginTop: 10, 
+  alignItems: 'center',
+  marginBottom : 70
+},
+errorText: {
+  color: '#0961F5',
+  fontSize:20,
+  textAlign: 'center',
+  fontFamily:'Mulish-Bold'
+},
+  // modal 
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalImage: {
+    width: 80,
+    height: 80,
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+// button tiếp theo
+btnBottom: {
+  position: 'absolute',
+  bottom:20,
+  width: '100%',
+  alignItems: 'center', 
+  justifyContent: 'center', 
+  paddingLeft : 40
+},
+btnNextLesson: {
+  backgroundColor: '#007BFF',
+  borderRadius: 30,
+  height: 50,
+  width: '90%', 
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+txtNext: {
+  color: '#fff',
+  fontSize: 16,
+  fontFamily: 'Mulish-Bold',
+},
+txtError: {
+  textAlign: 'center', 
+  color: 'red',
+  fontSize: 14,
+},
+//
   noDataContainer: {
     justifyContent: 'center',
     alignItems: 'center',
